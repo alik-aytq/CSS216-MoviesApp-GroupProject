@@ -2,10 +2,11 @@ package com.example.moviesapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val CinemaBackground = Color(0xFF1C1A17)
+val CinemaSurface = Color(0xFF2A2723)
+val CinemaGold = Color(0xFFE8B64C)
+val CinemaTextPrimary = Color(0xFFF3EFE8)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val CinemaOnGold = Color(0xFF241A0A)
+val CinemaTextSecondary = Color(0xFFB8B0A5)
+val CinemaOutline = Color(0xFF5C554B)
