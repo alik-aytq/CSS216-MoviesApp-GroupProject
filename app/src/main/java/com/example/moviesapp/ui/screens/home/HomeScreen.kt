@@ -14,73 +14,66 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import com.example.moviesapp.ui.model.MovieUiModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.moviesapp.ui.components.MovieCard
+import com.example.moviesapp.ui.model.MovieUiModel
 
 @Composable
 fun HomeScreen(
     movies: List<MovieUiModel>,
     favoriteIds: Set<String>,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
     onMovieClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit
-){
-    var searchText by rememberSaveable {mutableStateOf("")}
-    
-    val filteredMovies=movies.filter {it.title.contains(searchText.trim(), ignoreCase = true)}
-
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-    ){
+    ) {
         Text(
             text = "Movies App",
-            style= MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier= Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value=searchText,
-            onValueChange = {searchText=it},
-            label = {Text("Search movies")},
+            value = searchText,
+            onValueChange = onSearchTextChange,
+            label = { Text("Search movies") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
-        Spacer(modifier= Modifier.height(16.dp))
-        
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text="Movies (${filteredMovies.size})",
+            text = "Movies (${movies.size})",
             style = MaterialTheme.typography.titleLarge
         )
-        
-        Spacer(modifier= Modifier.height(12.dp))
-        
-        if (filteredMovies.isEmpty()){
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (movies.isEmpty()) {
             Text(
                 text = "No movies found",
-                color= MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        } else{
+        } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 items(
-                    items=filteredMovies,
-                    key={it.id}
-                ) {
-                    movie->
+                    items = movies,
+                    key = { it.id }
+                ) { movie ->
                     MovieCard(
-                        movie=movie,
+                        movie = movie,
                         isFavorite = movie.id in favoriteIds,
                         onOpen = {
                             onMovieClick(movie.id)

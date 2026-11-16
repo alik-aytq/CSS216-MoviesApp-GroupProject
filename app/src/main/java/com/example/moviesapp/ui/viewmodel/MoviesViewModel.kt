@@ -42,4 +42,10 @@ class MoviesViewModel : ViewModel() {
             )
         }
     }
+
+    fun updateSearchText(text: String) {
+        _uiState.update { currentState ->
+            currentState.copy(searchText = text)
+        }
+    }
 }

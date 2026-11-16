@@ -29,7 +29,10 @@ class MainActivity : ComponentActivity() {
                 MoviesNavGraph(
                     movies = uiState.movies,
                     favoriteIds = uiState.favoriteIds,
-                    onFavoriteClick = moviesViewModel::toggleFavorite
+                    onFavoriteClick = moviesViewModel::toggleFavorite,
+                    filteredMovies = uiState.filteredMovies,
+                    searchText = uiState.searchText,
+                    onSearchTextChange = moviesViewModel::updateSearchText
                 )
             }
         }
