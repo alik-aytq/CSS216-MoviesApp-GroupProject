@@ -33,7 +33,10 @@ private const val DETAILS = "movie/{movieId}"
 fun MoviesNavGraph(
     movies: List<MovieUiModel>,
     favoriteIds: Set<String>,
-    onFavoriteClick: (String) -> Unit
+    onFavoriteClick: (String) -> Unit,
+    filteredMovies: List<MovieUiModel>,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -89,8 +92,10 @@ fun MoviesNavGraph(
         ) {
             composable(HOME) {
                 HomeScreen(
-                    movies = movies,
+                    movies = filteredMovies,
                     favoriteIds = favoriteIds,
+                    searchText = searchText,
+                    onSearchTextChange = onSearchTextChange,
                     onMovieClick = { movieId ->
                         navController.navigate(
                             "movie/${Uri.encode(movieId)}"

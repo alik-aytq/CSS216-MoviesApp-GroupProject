@@ -5,12 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import com.example.moviesapp.ui.demo.demoMovies
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviesapp.ui.navigation.MoviesNavGraph
 import com.example.moviesapp.ui.theme.MoviesAppTheme
+import com.example.moviesapp.ui.viewmodel.MoviesViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -21,22 +20,19 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MoviesAppTheme {
-                var favoriteIds by rememberSaveable {
-                    mutableStateOf(arrayListOf<String>())
-                }
+
+                val moviesViewModel: MoviesViewModel = viewModel()
+
+                val uiState by moviesViewModel.uiState
+                    .collectAsStateWithLifecycle()
 
                 MoviesNavGraph(
-                    movies = demoMovies,
-                    favoriteIds = favoriteIds.toSet(),
-                    onFavoriteClick = { movieId ->
-                        favoriteIds = ArrayList(
-                            if (movieId in favoriteIds) {
-                                favoriteIds - movieId
-                            } else {
-                                favoriteIds + movieId
-                            }
-                        )
-                    }
+                    movies = uiState.movies,
+                    favoriteIds = uiState.favoriteIds,
+                    onFavoriteClick = moviesViewModel::toggleFavorite,
+                    filteredMovies = uiState.filteredMovies,
+                    searchText = uiState.searchText,
+                    onSearchTextChange = moviesViewModel::updateSearchText
                 )
             }
         }
