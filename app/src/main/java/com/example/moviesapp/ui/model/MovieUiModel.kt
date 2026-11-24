@@ -10,5 +10,6 @@ data class MovieUiModel(
     val duration: String,
     val rating: Double,
     val description: String,
-    val posterColor: Color
+    val posterColor: Color,
+    val posterUrl: String? = null
 )
