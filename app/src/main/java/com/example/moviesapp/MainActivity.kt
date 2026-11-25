@@ -6,22 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Switch
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.moviesapp.ui.components.SavedMovieEditor
+
 import com.example.moviesapp.ui.navigation.MoviesNavGraph
 import com.example.moviesapp.ui.state.ApiStatus
 import com.example.moviesapp.ui.theme.MoviesAppTheme
@@ -31,79 +30,82 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
-            val vm: MoviesViewModel = viewModel()
 
-            val state by vm.uiState.collectAsStateWithLifecycle()
-            val saved by vm.savedMovies.collectAsStateWithLifecycle()
-            val dark by vm.darkTheme.collectAsStateWithLifecycle()
+            val moviesViewModel: MoviesViewModel = viewModel()
 
-            var showEditor by remember {
-                mutableStateOf(false)
-            }
+            val uiState by moviesViewModel.uiState
+                .collectAsStateWithLifecycle()
 
-            MoviesAppTheme(darkTheme = dark) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
+            MoviesAppTheme {
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
                     ) {
-                        Text("Dark mode")
 
-                        Switch(
-                            checked = dark,
-                            onCheckedChange = vm::setDarkTheme
-                        )
-
-                        Button(
-                            onClick = {
-                                showEditor = !showEditor
-                            }
-                        ) {
-                            Text(
-                                if (showEditor) {
-                                    "Catalog"
-                                } else {
-                                    "Saved notes"
-                                }
-                            )
-                        }
-                    }
-
-                    if (showEditor) {
-                        SavedMovieEditor(
-                            movies = saved,
-                            onUpdate = vm::updateNote,
-                            onDelete = vm::deleteSaved
-                        )
-                    } else {
-                        when (val status = state.status) {
+                        when (val status = uiState.status) {
 
                             ApiStatus.Loading -> {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.padding(24.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    CircularProgressIndicator()
+
+                                    Text(
+                                        text = "Loading movies...",
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
                             }
 
                             ApiStatus.Empty -> {
-                                Column {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
                                     Text("No movies available")
-                                    Button(onClick = vm::retry) {
+
+                                    Button(
+                                        onClick = moviesViewModel::retry
+                                    ) {
                                         Text("Retry")
                                     }
                                 }
                             }
 
                             is ApiStatus.Error -> {
-                                Column {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(24.dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
                                     Text(
-                                        "Could not load movies: ${status.message}"
+                                        text = "Could not load movies",
+                                        style = MaterialTheme.typography.titleLarge
                                     )
-                                    Button(onClick = vm::retry) {
+
+                                    Text(
+                                        text = status.message,
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+
+                                    Button(
+                                        onClick = moviesViewModel::retry
+                                    ) {
                                         Text("Retry")
                                     }
                                 }
@@ -111,12 +113,14 @@ class MainActivity : ComponentActivity() {
 
                             ApiStatus.Success -> {
                                 MoviesNavGraph(
-                                    movies = state.movies,
-                                    favoriteIds = state.favoriteIds,
-                                    onFavoriteClick = vm::toggleFavorite,
-                                    filteredMovies = state.filteredMovies,
-                                    searchText = state.searchText,
-                                    onSearchTextChange = vm::updateSearchText
+                                    movies = uiState.movies,
+                                    favoriteIds = uiState.favoriteIds,
+                                    onFavoriteClick =
+                                        moviesViewModel::toggleFavorite,
+                                    filteredMovies = uiState.filteredMovies,
+                                    searchText = uiState.searchText,
+                                    onSearchTextChange =
+                                        moviesViewModel::updateSearchText
                                 )
                             }
                         }

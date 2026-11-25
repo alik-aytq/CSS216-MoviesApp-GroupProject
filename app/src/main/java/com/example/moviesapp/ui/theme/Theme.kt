@@ -2,7 +2,6 @@ package com.example.moviesapp.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val CinemaDarkColorScheme = darkColorScheme(
@@ -19,19 +18,12 @@ private val CinemaDarkColorScheme = darkColorScheme(
     outline = CinemaOutline
 )
 
-private val CinemaLightColorScheme = lightColorScheme()
-
 @Composable
 fun MoviesAppTheme(
-    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) {
-            CinemaDarkColorScheme
-        } else {
-            CinemaLightColorScheme
-        },
+        colorScheme = CinemaDarkColorScheme,
         typography = CinemaTypography,
         content = content
     )
