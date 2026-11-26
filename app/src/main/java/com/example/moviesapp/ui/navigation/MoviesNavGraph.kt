@@ -25,6 +25,7 @@ import com.example.moviesapp.ui.screens.home.HomeScreen
 import com.example.moviesapp.ui.screens.details.MovieDetailsScreen
 import com.example.moviesapp.ui.screens.favorites.FavoritesScreen
 import com.example.moviesapp.data.local.SavedMovie
+import com.example.moviesapp.data.local.toUiModel
 
 private const val HOME = "home"
 private const val FAVORITES = "favorites"
@@ -114,9 +115,7 @@ fun MoviesNavGraph(
 
             composable(FAVORITES) {
                 FavoritesScreen(
-                    movies = movies.filter {
-                        it.id in favoriteIds
-                    },
+                    movies = savedMovies,
                     onMovieClick = { movieId ->
                         navController.navigate(
                             "movie/${Uri.encode(movieId)}"
@@ -138,7 +137,9 @@ fun MoviesNavGraph(
 
                 val movie = movies.firstOrNull {
                     it.id == movieId
-                }
+                } ?: savedMovies.firstOrNull {
+                    it.id == movieId
+                }?.toUiModel()
 
                 MovieDetailsScreen(
                     movie = movie,
