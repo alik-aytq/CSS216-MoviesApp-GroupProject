@@ -26,6 +26,7 @@ import com.example.moviesapp.ui.screens.details.MovieDetailsScreen
 import com.example.moviesapp.ui.screens.favorites.FavoritesScreen
 import com.example.moviesapp.data.local.SavedMovie
 import com.example.moviesapp.data.local.toUiModel
+import com.example.moviesapp.ui.state.ApiStatus
 
 private const val HOME = "home"
 private const val FAVORITES = "favorites"
@@ -33,6 +34,8 @@ private const val DETAILS = "movie/{movieId}"
 
 @Composable
 fun MoviesNavGraph(
+    apiStatus: ApiStatus,
+    onRetry: () -> Unit,
     sortByRating: Boolean,
     onSortByRatingChange: (Boolean) -> Unit,
     movies: List<MovieUiModel>,
@@ -98,8 +101,6 @@ fun MoviesNavGraph(
         ) {
             composable(HOME) {
                 HomeScreen(
-                    sortByRating = sortByRating,
-                    onSortByRatingChange = onSortByRatingChange,
                     movies = filteredMovies,
                     favoriteIds = favoriteIds,
                     searchText = searchText,
@@ -109,7 +110,11 @@ fun MoviesNavGraph(
                             "movie/${Uri.encode(movieId)}"
                         )
                     },
-                    onFavoriteClick = onFavoriteClick
+                    onFavoriteClick = onFavoriteClick,
+                    sortByRating = sortByRating,
+                    onSortByRatingChange = onSortByRatingChange,
+                    apiStatus = apiStatus,
+                    onRetry = onRetry
                 )
             }
 

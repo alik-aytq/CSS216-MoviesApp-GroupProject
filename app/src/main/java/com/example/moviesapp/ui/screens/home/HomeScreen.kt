@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -20,10 +22,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+
 import com.example.moviesapp.ui.components.MovieCard
 import com.example.moviesapp.ui.model.MovieUiModel
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
+import com.example.moviesapp.ui.state.ApiStatus
 
 @Composable
 fun HomeScreen(
@@ -34,7 +36,9 @@ fun HomeScreen(
     onMovieClick: (String) -> Unit,
     onFavoriteClick: (String) -> Unit,
     sortByRating: Boolean,
-    onSortByRatingChange: (Boolean) -> Unit
+    onSortByRatingChange: (Boolean) -> Unit,
+    apiStatus: ApiStatus,
+    onRetry: () -> Unit
 ) {
     val displayMovies = remember(movies, sortByRating) {
         if (sortByRating) {
@@ -49,10 +53,7 @@ fun HomeScreen(
             movies
         }
     }
-    val listState = rememberLazyListState()
-    LaunchedEffect(sortByRating) {
-        listState.scrollToItem(0)
-    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,40 +92,94 @@ fun HomeScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        when (apiStatus) {
 
-        Text(
-            text = "Movies (${displayMovies.size})",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (displayMovies.isEmpty()) {
-            Text(
-                text = "No movies found",
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)) {
-                items(
-                    items = displayMovies,
-                    key = { it.id }
-                ) { movie ->
-                    MovieCard(
-                        movie = movie,
-                        isFavorite = movie.id in favoriteIds,
-                        onOpen = {
-                            onMovieClick(movie.id)
-                        },
-                        onToggleFavorite = {
-                            onFavoriteClick(movie.id)
-                        }
+            ApiStatus.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(
+                        Alignment.CenterHorizontally
                     )
+                )
+
+                Text(
+                    text = "Loading movies...",
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+
+            ApiStatus.Empty -> {
+                Text("No movies available")
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(onClick = onRetry) {
+                    Text("Retry")
+                }
+            }
+
+            is ApiStatus.Error -> {
+                Text(
+                    text = "Could not load movies",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(apiStatus.message)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(onClick = onRetry) {
+                    Text("Retry")
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Your saved movies are still available in Favorites.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            ApiStatus.Success -> {
+                Text(
+                    text = "Movies (${displayMovies.size})",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (displayMovies.isEmpty()) {
+                    Text(
+                        text = "No movies found",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement =
+                            Arrangement.spacedBy(12.dp),
+                        contentPadding =
+                            PaddingValues(bottom = 16.dp)
+                    ) {
+                        items(
+                            items = displayMovies,
+                            key = { it.id }
+                        ) { movie ->
+                            MovieCard(
+                                movie = movie,
+                                isFavorite = movie.id in favoriteIds,
+                                onOpen = {
+                                    onMovieClick(movie.id)
+                                },
+                                onToggleFavorite = {
+                                    onFavoriteClick(movie.id)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
