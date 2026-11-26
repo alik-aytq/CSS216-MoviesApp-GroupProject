@@ -51,6 +51,12 @@ class MoviesViewModel(
             SharingStarted.WhileSubscribed(5000),
             true
         )
+    val sortByRating: StateFlow<Boolean> =
+        preferences.sortByRating.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )
 
     init {
         viewModelScope.launch {
@@ -102,6 +108,12 @@ class MoviesViewModel(
                     )
                 }
             }
+        }
+    }
+
+    fun setSortByRating(value: Boolean) {
+        viewModelScope.launch {
+            preferences.setSortByRating(value)
         }
     }
 

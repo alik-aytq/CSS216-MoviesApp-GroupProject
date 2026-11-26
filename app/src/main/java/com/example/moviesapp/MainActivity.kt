@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
                 .collectAsStateWithLifecycle()
             val savedMovies by moviesViewModel.savedMovies
                 .collectAsStateWithLifecycle()
+            val sortByRating by moviesViewModel.sortByRating
+                .collectAsStateWithLifecycle()
 
             MoviesAppTheme {
 
@@ -115,6 +117,9 @@ class MainActivity : ComponentActivity() {
 
                             ApiStatus.Success -> {
                                 MoviesNavGraph(
+                                    sortByRating = sortByRating,
+                                    onSortByRatingChange =
+                                        moviesViewModel::setSortByRating,
                                     savedMovies = savedMovies,
                                     onNoteSave = moviesViewModel::updateNote,
                                     movies = uiState.movies,

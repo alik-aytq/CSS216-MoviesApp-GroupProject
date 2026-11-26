@@ -32,6 +32,8 @@ private const val DETAILS = "movie/{movieId}"
 
 @Composable
 fun MoviesNavGraph(
+    sortByRating: Boolean,
+    onSortByRatingChange: (Boolean) -> Unit,
     movies: List<MovieUiModel>,
     savedMovies: List<SavedMovie>,
     favoriteIds: Set<String>,
@@ -95,6 +97,8 @@ fun MoviesNavGraph(
         ) {
             composable(HOME) {
                 HomeScreen(
+                    sortByRating = sortByRating,
+                    onSortByRatingChange = onSortByRatingChange,
                     movies = filteredMovies,
                     favoriteIds = favoriteIds,
                     searchText = searchText,
