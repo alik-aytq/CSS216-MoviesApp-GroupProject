@@ -22,7 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import com.example.moviesapp.ui.components.MovieCard
 import com.example.moviesapp.ui.model.MovieUiModel
 import com.example.moviesapp.ui.state.ApiStatus
@@ -52,6 +53,10 @@ fun HomeScreen(
         } else {
             movies
         }
+    }
+    val listState = rememberLazyListState()
+    LaunchedEffect(sortByRating) {
+        listState.scrollToItem(0)
     }
 
     Column(
@@ -158,6 +163,7 @@ fun HomeScreen(
                     )
                 } else {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier.weight(1f),
                         verticalArrangement =
                             Arrangement.spacedBy(12.dp),
