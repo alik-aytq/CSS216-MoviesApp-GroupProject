@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.moviesapp.ui.components.MovieCard
 import com.example.moviesapp.ui.model.MovieUiModel
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun HomeScreen(
@@ -47,7 +49,10 @@ fun HomeScreen(
             movies
         }
     }
-
+    val listState = rememberLazyListState()
+    LaunchedEffect(sortByRating) {
+        listState.scrollToItem(0)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -102,10 +107,10 @@ fun HomeScreen(
             )
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
+                contentPadding = PaddingValues(bottom = 16.dp)) {
                 items(
                     items = displayMovies,
                     key = { it.id }
