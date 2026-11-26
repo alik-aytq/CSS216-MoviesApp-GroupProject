@@ -39,6 +39,8 @@ class MainActivity : ComponentActivity() {
 
             val uiState by moviesViewModel.uiState
                 .collectAsStateWithLifecycle()
+            val savedMovies by moviesViewModel.savedMovies
+                .collectAsStateWithLifecycle()
 
             MoviesAppTheme {
 
@@ -113,6 +115,8 @@ class MainActivity : ComponentActivity() {
 
                             ApiStatus.Success -> {
                                 MoviesNavGraph(
+                                    savedMovies = savedMovies,
+                                    onNoteSave = moviesViewModel::updateNote,
                                     movies = uiState.movies,
                                     favoriteIds = uiState.favoriteIds,
                                     onFavoriteClick =
